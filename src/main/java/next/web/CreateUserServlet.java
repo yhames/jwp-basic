@@ -26,7 +26,7 @@ public class CreateUserServlet extends HttpServlet {
         String userId = req.getParameter("userId");
 
         if (DataBase.findUserById(userId) != null) {
-            resp.sendRedirect("/user/form.html");
+            resp.sendRedirect("/user/form.jsp");
             return;
         }
 

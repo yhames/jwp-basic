@@ -19,7 +19,7 @@
     <div class="col-md-12">
         <div class="navbar-header">
 
-            <a href="../index.html" class="navbar-brand">SLiPP</a>
+            <a href="../index.jsp" class="navbar-brand">SLiPP</a>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse1">
                 <i class="glyphicon glyphicon-search"></i>
             </button>
@@ -43,7 +43,7 @@
                         <li><a href="https://facebook.com" target="_blank">Facebook</a></li>
                     </ul>
                 </li>
-                <li><a href="list.jsp"><i class="glyphicon glyphicon-user"></i></a></li>
+                <li><a href="/user/list"><i class="glyphicon glyphicon-user"></i></a></li>
             </ul>
         </div>
     </div>
@@ -55,7 +55,7 @@
                data-toggle="dropdown"><i class="glyphicon glyphicon-home" style="color:#dd1111;"></i> Home <small><i
                     class="glyphicon glyphicon-chevron-down"></i></small></a>
             <ul class="nav dropdown-menu">
-                <li><a href="../user/profile.html"><i class="glyphicon glyphicon-user" style="color:#1111dd;"></i>
+                <li><a href="profile.jsp"><i class="glyphicon glyphicon-user" style="color:#1111dd;"></i>
                     Profile</a></li>
                 <li class="nav-divider"></li>
                 <li><a href="#"><i class="glyphicon glyphicon-cog" style="color:#dd1111;"></i> Settings</a></li>
@@ -63,11 +63,21 @@
         </div>
         <div class="collapse navbar-collapse" id="navbar-collapse2">
             <ul class="nav navbar-nav navbar-right">
-                <li class="active"><a href="../index.html">Posts</a></li>
-                <li><a href="../user/login.html" role="button">로그인</a></li>
-                <li><a href="../user/form.html" role="button">회원가입</a></li>
-                <li><a href="#" role="button">로그아웃</a></li>
-                <li><a href="#" role="button">개인정보수정</a></li>
+                <li class="active"><a href="../index.jsp">Posts</a></li>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        <li><a href="/user/logout" role="button">로그아웃</a></li>
+                        <li><a href="#" role="button">개인정보수정</a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li><a href="/user/login" role="button">로그인</a></li>
+                        <li><a href="/user/form.jsp" role="button">회원가입</a></li>
+                        <!--
+                        <li><a href="#loginModal" role="button" data-toggle="modal">로그인</a></li>
+                        <li><a href="#registerModal" role="button" data-toggle="modal">회원가입</a></li>
+                        -->
+                    </c:otherwise>
+                </c:choose>
             </ul>
         </div>
     </div>
