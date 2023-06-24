@@ -17,8 +17,12 @@ public class LoginUserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User findUser = DataBase.findUserById(req.getParameter("userId"));
-        if (findUser != null
-                && findUser.getPassword().equals(req.getParameter("password"))) {
+        if (findUser == null) {
+            resp.sendRedirect("/user/login_failed.jsp");
+            return;
+        }
+
+        if (findUser.getPassword().equals(req.getParameter("password"))) {
             HttpSession session = req.getSession();
             session.setAttribute("user", findUser);
             log.debug("user : {}", findUser);

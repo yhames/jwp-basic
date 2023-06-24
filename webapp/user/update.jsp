@@ -67,7 +67,7 @@
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
                         <li><a href="/user/logout" role="button">로그아웃</a></li>
-                        <li><a href="#" role="button">개인정보수정</a></li>
+                        <li><a href="/user/update" role="button">개인정보수정</a></li>
                     </c:when>
                     <c:otherwise>
                         <li><a href="/user/login" role="button">로그인</a></li>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="form-group">
                     <label for="password">비밀번호</label>
-                    <input type="password" class="form-control" id="password" placeholder="변경할 비밀번호를 입력하세요.">
+                    <input type="password" class="form-control" id="password" name="password" value="${user.password}" placeholder="변경할 비밀번호를 입력하세요.">
                 </div>
                 <div class="form-group">
                     <label for="name">이름</label>

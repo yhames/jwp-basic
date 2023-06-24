@@ -67,7 +67,7 @@
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
                         <li><a href="/user/logout" role="button">로그아웃</a></li>
-                        <li><a href="#" role="button">개인정보수정</a></li>
+                        <li><a href="/user/update" role="button">개인정보수정</a></li>
                     </c:when>
                     <c:otherwise>
                         <li><a href="/user/login" role="button">로그인</a></li>
@@ -104,10 +104,12 @@
                         <td>${user.name}</td>
                         <td>${user.email}</td>
                         <td>
-                            <form action="/user/update" method="get">
-                                <input type="hidden" id="userId" name="userId" value="${user.userId}"/>
-                                <button type="submit" class="btn btn-success clearfix pull-right">수정</button>
-                            </form>
+                            <c:if test="${user eq sessionScope.user}">
+                                <form action="/user/update" method="get">
+                                    <input type="hidden" id="userId" name="userId" value="${user.userId}"/>
+                                    <button type="submit" class="btn btn-success clearfix pull-right">수정</button>
+                                </form>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>
