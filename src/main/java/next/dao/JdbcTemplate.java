@@ -1,6 +1,7 @@
 package next.dao;
 
 import core.jdbc.ConnectionManager;
+import org.h2.result.Row;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,61 +10,51 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class JdbcTemplate {
+public class JdbcTemplate {
 
-    void execute(String sql) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        try {
-            con = ConnectionManager.getConnection();
-            pstmt = con.prepareStatement(sql);
-            setValues(pstmt);
+    void execute(String sql, Object... parameters) {
+        try (Connection con = ConnectionManager.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            for (int i = 0; i < parameters.length; i++) {
+                pstmt.setObject(i + 1, parameters[i]);
+            }
             pstmt.executeUpdate();
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
-            }
-            if (con != null) {
-                con.close();
-            }
+        } catch (SQLException e) {
+            throw new DataAccessException();
         }
     }
-    List query(String sql) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
+
+    <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... parameters) {
         ResultSet rs = null;
-        try {
-            con = ConnectionManager.getConnection();
-            pstmt = con.prepareStatement(sql);
-            setValues(pstmt);
+        try (Connection con = ConnectionManager.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            for (int i = 0; i < parameters.length; i++) {
+                pstmt.setObject(i + 1, parameters[i]);
+            }
             rs = pstmt.executeQuery();
-            List<Object> list = new ArrayList<>();
+            List<T> list = new ArrayList<T>();
             while (rs.next()) {
-                list.add(mapRow(rs));
+                list.add(rowMapper.mapRow(rs));
             }
             return list;
+        } catch (SQLException e) {
+            throw new DataAccessException();
         } finally {
             if (rs != null) {
-                rs.close();
-            }
-            if (pstmt != null) {
-                pstmt.close();
-            }
-            if (con != null) {
-                con.close();
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DataAccessException();
+                }
             }
         }
     }
 
-    Object queryForObject(String sql) throws SQLException {
-        List result = query(sql);
+    <T> T queryForObject(String sql, RowMapper<T> rowMapper, Object... parameters) {
+        List<T> result = query(sql, rowMapper, parameters);
         if (result.isEmpty()) {
             return null;
         }
         return result.get(0);
     }
-
-    abstract Object mapRow(ResultSet rs) throws SQLException;
-
-    abstract void setValues(PreparedStatement pstmt) throws SQLException;
 }
