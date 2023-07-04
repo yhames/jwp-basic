@@ -23,6 +23,7 @@ public class JdbcTemplate {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
+            throw new DataAccessException(e);
         }
     }
 
@@ -42,14 +43,14 @@ public class JdbcTemplate {
             return list;
         } catch (SQLException e) {
             log.error(e.getMessage());
-            throw new DataAccessException();
+            throw new DataAccessException(e);
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
                 } catch (SQLException e) {
                     log.error(e.getMessage());
-                    throw new DataAccessException();
+                    throw new DataAccessException(e);
                 }
             }
         }
