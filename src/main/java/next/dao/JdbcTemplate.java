@@ -14,21 +14,25 @@ import java.util.List;
 public class JdbcTemplate {
     private static final Logger log = LoggerFactory.getLogger(JdbcTemplate.class);
 
-    void execute(String sql, PreparedStatementSetter pss) {
+    void execute(String sql, Object... parameters) {
         try (Connection con = ConnectionManager.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pss.setValues(pstmt);
+            for (int i = 0; i < parameters.length; i++) {
+                pstmt.setObject(i + 1, parameters[i]);
+            }
             pstmt.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
     }
 
-    <T> List<T> query(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) {
+    <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... parameters) {
         ResultSet rs = null;
         try (Connection con = ConnectionManager.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pss.setValues(pstmt);
+            for (int i = 0; i < parameters.length; i++) {
+                pstmt.setObject(i + 1, parameters[i]);
+            }
             rs = pstmt.executeQuery();
 
             List<T> list = new ArrayList<>();
@@ -51,8 +55,8 @@ public class JdbcTemplate {
         }
     }
 
-    <T> T queryForObject(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) {
-        List<T> users = query(sql, pss, rowMapper);
+    <T> T queryForObject(String sql, RowMapper<T> rowMapper, Object... parameters) {
+        List<T> users = query(sql, rowMapper, parameters);
         if (users.isEmpty()) {
             return null;
         }
