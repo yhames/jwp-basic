@@ -19,16 +19,22 @@ public class UserDao {
 
     public List<User> findAll() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        RowMapper<User> rowMapper = rs -> new User(rs.getString("userId"), rs.getString("password"),
-                rs.getString("name"), rs.getString("email"));
+        RowMapper<User> rowMapper = rs -> new User(
+                rs.getString("userId"),
+                rs.getString("password"),
+                rs.getString("name"),
+                rs.getString("email"));
         String sql = "SELECT userId, password, name, email FROM USERS";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     public User findByUserId(String userId) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        RowMapper<User> rowMapper = rs -> new User(rs.getString("userId"), rs.getString("password"),
-                rs.getString("name"), rs.getString("email"));
+        RowMapper<User> rowMapper = rs -> new User(
+                rs.getString("userId"),
+                rs.getString("password"),
+                rs.getString("name"),
+                rs.getString("email"));
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
         return jdbcTemplate.queryForObject(sql, rowMapper, userId);
     }
