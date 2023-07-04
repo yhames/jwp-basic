@@ -2,11 +2,10 @@ package next.dao;
 
 import next.model.User;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserDao {
-    public void insert(User user) throws SQLException {
+    public void insert(User user) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> {
             pstmt.setString(1, user.getUserId());
@@ -18,7 +17,7 @@ public class UserDao {
         jdbcTemplate.execute(sql, pss);
     }
 
-    public void update(User user) throws SQLException {
+    public void update(User user) {
         JdbcTemplate updateJdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> {
             pstmt.setString(1, user.getPassword());
@@ -30,7 +29,7 @@ public class UserDao {
         updateJdbcTemplate.execute(sql, pss);
     }
 
-    public List<User> findAll() throws SQLException {
+    public List<User> findAll() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> {
         };
@@ -40,7 +39,7 @@ public class UserDao {
         return jdbcTemplate.query(sql, pss, rowMapper);
     }
 
-    public User findByUserId(String userId) throws SQLException {
+    public User findByUserId(String userId) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
         PreparedStatementSetter pss = pstmt -> pstmt.setString(1, userId);
         RowMapper rowMapper = rs -> new User(rs.getString("userId"), rs.getString("password"),

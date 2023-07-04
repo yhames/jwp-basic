@@ -22,13 +22,9 @@ public class CreateUserController implements Controller {
                 req.getParameter("email"));
         log.debug("User : {}", user);
 
-
         UserDao userDao = new UserDao();
-        try {
-            userDao.insert(user);
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-        }
+
+        userDao.insert(user);
 
         return "redirect:/";
     }
