@@ -24,6 +24,11 @@ public class UserDao {
                 pstmt.setString(3, user.getName());
                 pstmt.setString(4, user.getEmail());
             }
+
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
         };
         jdbcTemplate.execute();
     }
@@ -42,12 +47,17 @@ public class UserDao {
                 pstmt.setString(3, user.getEmail());
                 pstmt.setString(4, user.getUserId());
             }
+
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
         };
         updateJdbcTemplate.execute();
     }
 
     public List<User> findAll() throws SQLException {
-        SelectJdbcTemplate selectJdbcTemplate = new SelectJdbcTemplate() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
             String createQuery() {
                 return "SELECT userId, password, name, email FROM USERS";
@@ -64,11 +74,11 @@ public class UserDao {
                         rs.getString("name"), rs.getString("email"));
             }
         };
-        return selectJdbcTemplate.query();
+        return jdbcTemplate.query();
     }
 
     public User findByUserId(String userId) throws SQLException {
-        SelectJdbcTemplate selectJdbcTemplate = new SelectJdbcTemplate() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
             String createQuery() {
                 return "SELECT userId, password, name, email FROM USERS WHERE userid=?";
@@ -85,6 +95,6 @@ public class UserDao {
                         rs.getString("email"));
             }
         };
-        return (User) selectJdbcTemplate.queryForObject();
+        return (User) jdbcTemplate.queryForObject();
     }
 }
