@@ -1,7 +1,6 @@
 package next.dao;
 
 import core.jdbc.ConnectionManager;
-import next.controller.CreateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +24,14 @@ public class JdbcTemplate {
         }
     }
 
-    List query(String sql, PreparedStatementSetter pss, RowMapper rowMapper) {
+    <T> List<T> query(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) {
         ResultSet rs = null;
         try (Connection con = ConnectionManager.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
             pss.setValues(pstmt);
             rs = pstmt.executeQuery();
 
-            List<Object> list = new ArrayList<>();
+            List<T> list = new ArrayList<>();
             while (rs.next()) {
                 list.add(rowMapper.mapRow(rs));
             }
@@ -52,12 +51,11 @@ public class JdbcTemplate {
         }
     }
 
-    Object queryForObject(String sql, PreparedStatementSetter pss, RowMapper rowMapper) {
-        List users = query(sql, pss, rowMapper);
+    <T> T queryForObject(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) {
+        List<T> users = query(sql, pss, rowMapper);
         if (users.isEmpty()) {
             return null;
         }
         return users.get(0);
     }
-
 }
