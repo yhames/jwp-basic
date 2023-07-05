@@ -1,4 +1,4 @@
-package next.controller;
+package next.controller.user;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,7 +14,7 @@ public class LoginController implements Controller {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");
         UserDao userDao = new UserDao();
-        User user = userDao.findByUserId(userId);
+        User user = userDao.findById(userId);
         if (user == null) {
             req.setAttribute("loginFailed", true);
             return "/user/login.jsp";

@@ -1,25 +1,37 @@
 package core.jdbc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTemplate {
-    public void update(String sql, PreparedStatementSetter pss) throws DataAccessException {
+    public Long update(String sql, PreparedStatementSetter pss) throws DataAccessException {
+        ResultSet rs = null;
         try (Connection conn = ConnectionManager.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pss.setParameters(pstmt);
             pstmt.executeUpdate();
+            rs = pstmt.getGeneratedKeys();
+            Long id = 0L;
+            if (rs.next()) {
+                id = rs.getLong(1);
+            }
+            return id;
         } catch (SQLException e) {
             throw new DataAccessException(e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new DataAccessException(e);
+                }
+            }
         }
     }
 
-    public void update(String sql, Object... parameters) {
-        update(sql, createPreparedStatementSetter(parameters));
+    public Long update(String sql, Object... parameters) {
+        return update(sql, createPreparedStatementSetter(parameters));
     }
 
     public <T> T queryForObject(String sql, RowMapper<T> rm, PreparedStatementSetter pss) {
@@ -37,7 +49,7 @@ public class JdbcTemplate {
     public <T> List<T> query(String sql, RowMapper<T> rm, PreparedStatementSetter pss) throws DataAccessException {
         ResultSet rs = null;
         try (Connection conn = ConnectionManager.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pss.setParameters(pstmt);
             rs = pstmt.executeQuery();
 
