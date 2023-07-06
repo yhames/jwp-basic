@@ -14,7 +14,7 @@
         <div class="panel panel-default qna-list">
             <ul class="list">
                 <%-- 머리부터 --%>
-                <c:forEach items="${questions}" var="question" varStatus="status">
+                <c:forEach items="${questions}" var="question">
                 <li>
                     <div class="wrap">
                         <div class="main">

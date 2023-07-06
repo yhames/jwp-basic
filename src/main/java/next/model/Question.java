@@ -20,6 +20,13 @@ public class Question {
         this.countOfAnswer = countOfAnswer;
     }
 
+    public Question(String writer, String title, String contents) {
+        this.writer = writer;
+        this.title = title;
+        this.contents = contents;
+        this.createdDate = LocalDateTime.now();
+    }
+
     public void update(String writer, String title, String contents) {
         this.writer = writer;
         this.title = title;

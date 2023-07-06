@@ -2,6 +2,7 @@ package next.dao;
 
 import core.jdbc.ConnectionManager;
 import next.model.Answer;
+import next.model.Question;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -16,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class AnswerDaoTest {
 
     private final AnswerDao answerDao = new AnswerDao();
+    private final QuestionDao questionDao = new QuestionDao();
 
     @Before
     public void setup() {
@@ -64,4 +66,18 @@ public class AnswerDaoTest {
         assertEquals(5, answers.size());
     }
 
+    @Test
+    public void findAllByQuestionId() {
+        // given
+        Long questionId = 7L;
+        Question question = questionDao.findById(questionId);
+
+        // when
+        List<Answer> allByQuestionId = answerDao.findAllByQuestionId(questionId);
+
+        // then
+        int actual = allByQuestionId.size();
+        int expected = question.getCountOfAnswer();
+        assertEquals(expected, actual);
+    }
 }
