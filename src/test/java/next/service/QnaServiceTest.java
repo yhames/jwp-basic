@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+//import org.mockito.runners.MockitoJUnitRunner;
 
 import next.CannotDeleteException;
 import next.dao.AnswerDao;
@@ -19,6 +19,7 @@ import next.dao.QuestionDao;
 import next.model.Answer;
 import next.model.Question;
 import next.model.User;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QnaServiceTest {
