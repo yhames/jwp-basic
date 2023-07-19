@@ -11,16 +11,23 @@ import core.web.view.ModelAndView;
 
 @Controller
 public class QnaController extends AbstractNewController {
+    @Inject
     private MyQnaService qnaService;
 
-    @Inject
-    public QnaController(MyQnaService qnaService) {
-        this.qnaService = qnaService;
-    }
+//    @Inject
+//    public QnaController(MyQnaService qnaService) {
+//        this.qnaService = qnaService;
+//    }
+
+//    @Inject
+//    public void setQnaService(MyQnaService qnaService) {
+//        this.qnaService = qnaService;
+//    }
 
     public MyQnaService getQnaService() {
         return qnaService;
     }
+
 
     @RequestMapping("/questions")
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) throws Exception {

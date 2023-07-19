@@ -1,18 +1,21 @@
 package core.di.factory;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import core.annotation.Controller;
+import core.di.factory.injector.ConstructorInjector;
+import core.di.factory.injector.FieldInjector;
+import core.di.factory.injector.Injector;
+import core.di.factory.injector.SetterInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import core.annotation.Controller;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class BeanFactory {
     private static final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
@@ -21,8 +24,18 @@ public class BeanFactory {
 
     private Map<Class<?>, Object> beans = Maps.newHashMap();
 
+    private List<Injector> injectors = new ArrayList<>();
+
     public BeanFactory(Set<Class<?>> preInstanticateBeans) {
         this.preInstanticateBeans = preInstanticateBeans;
+
+        injectors.add(new ConstructorInjector(this));
+        injectors.add(new FieldInjector(this));
+        injectors.add(new SetterInjector(this));
+    }
+
+    public Set<Class<?>> getPreInstanticateBeans() {
+        return preInstanticateBeans;
     }
 
     @SuppressWarnings("unchecked")
@@ -30,12 +43,20 @@ public class BeanFactory {
         return (T) beans.get(requiredType);
     }
 
+    public void registerBean(Class<?> clazz, Object bean) {
+        beans.put(clazz, bean);
+    }
+
     public void initialize() {
         for (Class<?> clazz : preInstanticateBeans) {
             if (beans.get(clazz) == null) {
                 logger.debug("instantiated Class : {}", clazz);
-                instantiateClass(clazz);
+//                instantiateClass(clazz);
+                inject(clazz);
             }
+        }
+        for (Class<?> bean : beans.keySet()) {
+            logger.debug("bean = {}", beans.get(bean));
         }
     }
 
@@ -84,5 +105,11 @@ public class BeanFactory {
             }
         }
         return controllers;
+    }
+
+    public void inject(Class<?> clazz) {
+        for (Injector injector : injectors) {
+            injector.inject(clazz);
+        }
     }
 }

@@ -4,7 +4,12 @@ import static org.reflections.ReflectionUtils.getAllConstructors;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 
@@ -25,6 +30,21 @@ public class BeanFactoryUtils {
             return null;
         }
         return injectedConstructors.iterator().next();
+    }
+
+    public static Set<Field> getInjectedField(Class<?> clazz) {
+        Field[] fields = clazz.getDeclaredFields();
+        return Arrays.stream(fields)
+                .filter(field -> field.isAnnotationPresent(Inject.class))
+                .collect(Collectors.toSet());
+    }
+
+    public static Set<Method> getInjectedSetters(Class<?> clazz) {
+        Method[] methods = clazz.getDeclaredMethods();
+        return Arrays.stream(methods)
+                .filter(method -> method.getName().startsWith("set"))
+                .filter(method -> method.isAnnotationPresent(Inject.class))
+                .collect(Collectors.toSet());
     }
 
     /**
