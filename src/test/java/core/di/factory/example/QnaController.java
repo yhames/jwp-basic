@@ -19,11 +19,6 @@ public class QnaController extends AbstractNewController {
 //        this.qnaService = qnaService;
 //    }
 
-//    @Inject
-//    public void setQnaService(MyQnaService qnaService) {
-//        this.qnaService = qnaService;
-//    }
-
     public MyQnaService getQnaService() {
         return qnaService;
     }
