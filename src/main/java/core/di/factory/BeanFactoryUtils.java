@@ -6,16 +6,32 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withReturnType;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import core.annotation.Bean;
 import core.annotation.Inject;
 
 public class BeanFactoryUtils {
+
+    public static Set<Method> getBeanMethods(Class<? extends Annotation> target, Class<?>... annotatedClasses) {
+        Set<Method> methods = new HashSet<>();
+        for (Class<?> annotatedClass : annotatedClasses) {
+            Arrays.stream(annotatedClass.getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(target))
+                    .forEach(methods::add);
+        }
+        return methods;
+    }
+
     @SuppressWarnings({ "unchecked" })
     public static Set<Method> getInjectedMethods(Class<?> clazz) {
         return getAllMethods(clazz, withAnnotation(Inject.class), withReturnType(void.class));
@@ -68,5 +84,13 @@ public class BeanFactoryUtils {
         }
 
         throw new IllegalStateException(injectedClazz + "인터페이스를 구현하는 Bean이 존재하지 않는다.");
+    }
+
+    public static void invokeMethod(Method method, Object bean, Object[] args) {
+        try {
+            method.invoke(bean, args);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

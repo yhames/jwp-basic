@@ -1,11 +1,13 @@
 package core.di.factory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
+import core.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -37,11 +39,48 @@ public class BeanFactory implements BeanDefinitionRegistry {
             return (T) bean;
         }
 
+        BeanDefinition beanDefinition = beanDefinitions.get(clazz);
+        if (beanDefinition instanceof AnnotatedBeanDefinition) {
+            bean = createAnnotatedBean(beanDefinition);
+            beans.put(clazz, bean);
+            return (T) bean;
+        }
+
         Class<?> concreteClass = findConcreteClass(clazz);
-        BeanDefinition beanDefinition = beanDefinitions.get(concreteClass);
+        beanDefinition = beanDefinitions.get(concreteClass);
         bean = inject(beanDefinition);
         beans.put(concreteClass, bean);
+        initialize(bean, concreteClass);
         return (T) bean;
+    }
+
+    private void initialize(Object bean, Class<?> beanClass) {
+        Set<Method> initializeMethods = BeanFactoryUtils.getBeanMethods(PostConstruct.class, beanClass);
+        if (initializeMethods.isEmpty()) {
+            return;
+        }
+        for (Method initializeMethod : initializeMethods) {
+            log.debug("@PostConstruct Initialize Method : {}", initializeMethod);
+            BeanFactoryUtils.invokeMethod(initializeMethod, bean, populateArguments(initializeMethod.getParameterTypes()));
+        }
+    }
+
+    private Object[] populateArguments(Class<?>[] parameterTypes) {
+        return Arrays.stream(parameterTypes)
+                .map(this::getBean)
+                .toArray();
+    }
+
+    private Object createAnnotatedBean(BeanDefinition beanDefinition) {
+        AnnotatedBeanDefinition abd = (AnnotatedBeanDefinition) beanDefinition;
+        Method method = abd.getMethod();
+        Object[] params = Arrays.stream(method.getParameterTypes()).map(this::getBean).toArray();
+        try {
+            return method.invoke(method.getDeclaringClass().getConstructor().newInstance(), params);
+        } catch (IllegalAccessException | InvocationTargetException
+                 | InstantiationException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Class<?> findConcreteClass(Class<?> clazz) {

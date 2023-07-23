@@ -1,5 +1,7 @@
 package core.jdbc;
 
+import core.annotation.Component;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,22 +9,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class JdbcTemplate {
-    private static JdbcTemplate jdbcTemplate;
-
-    private JdbcTemplate() {
-    }
-
-    public static JdbcTemplate getInstance() {
-        if (jdbcTemplate == null) {
-            jdbcTemplate = new JdbcTemplate();
-        }
-        return jdbcTemplate;
-    }
 
     public void update(String sql, PreparedStatementSetter pss) throws DataAccessException {
         try (Connection conn = ConnectionManager.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pss.setParameters(pstmt);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -64,7 +56,7 @@ public class JdbcTemplate {
     public <T> List<T> query(String sql, RowMapper<T> rm, PreparedStatementSetter pss) throws DataAccessException {
         ResultSet rs = null;
         try (Connection conn = ConnectionManager.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pss.setParameters(pstmt);
             rs = pstmt.executeQuery();
 

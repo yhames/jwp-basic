@@ -1,5 +1,6 @@
 package next.dao;
 
+import core.jdbc.JdbcTemplate;
 import next.model.Answer;
 
 import org.junit.Before;
@@ -15,6 +16,9 @@ import core.jdbc.ConnectionManager;
 public class AnswerDaoTest {
     private static final Logger log = LoggerFactory.getLogger(AnswerDaoTest.class);
 
+    private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
+    private final JdbcAnswerDao dut = new JdbcAnswerDao(jdbcTemplate);
+
     @Before
     public void setup() {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
@@ -24,9 +28,9 @@ public class AnswerDaoTest {
 
     @Test
     public void addAnswer() throws Exception {
+
         long questionId = 1L;
         Answer expected = new Answer("javajigi", "answer contents", questionId);
-        AnswerDao dut = new JdbcAnswerDao();
         Answer answer = dut.insert(expected);
         log.debug("Answer : {}", answer);
     }

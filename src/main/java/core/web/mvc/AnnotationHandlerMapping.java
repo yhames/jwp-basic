@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import core.di.factory.AnnotationConfigApplicationContext;
+import core.di.factory.MyConfiguration;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        ApplicationContext ac = new ApplicationContext(basePackages);
+        ApplicationContext ac = new AnnotationConfigApplicationContext(MyConfiguration.class);
+
         Map<Class<?>, Object> controllers = getControllers(ac);
         Set<Method> methods = getRequestMappingMethods(controllers.keySet());
         for (Method method : methods) {
